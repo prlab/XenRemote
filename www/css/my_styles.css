@@ -1,0 +1,153 @@
+.myProgressBar {
+	background: #6f5be1;
+	border-radius:100px;
+	border: outset;
+	height:30px;
+	border-top-color: black; 
+	border-bottom-color:white; 
+	border-right-color:white; 
+	border-left-color:black;
+	border-width: 2px;
+}
+
+.p{
+	text-align:center;
+}
+
+#refr, #add_host{
+	margin-right:5px;
+}
+
+.my-wrap{
+	word-wrap: break-all;
+}
+
+
+.home .scroll-content {
+  display: table !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin-top: -50px; /* the height of the centered content */
+  text-align: center;
+}
+.home .scroll {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.aligner{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.aligner-item{
+	max-width: 50%;
+}
+
+.error-popup .popup-buttons {
+	background: #f65656;
+}
+
+.error-popup .popup-buttons .button{
+	background: #f65656;
+}
+
+.error-popup .popup-body{
+	text-align: center;
+	color: #7b7b7b;
+}
+
+.error-popup .my-title {
+	font-size:20px;
+	color: #4d4d4d;
+}
+
+
+.error-popup .my-icon {
+	font-size: 50px;
+	color : #f65656;
+}
+
+.success-popup .popup-buttons {
+	background: #4caf50;
+}
+
+.success-popup .popup-buttons .button{
+	background: #4caf50;
+}
+
+.success-popup .popup-body{
+	text-align: center;
+	color: #7b7b7b;
+}
+
+.success-popup .my-title {
+	font-size:20px;
+	color: #4d4d4d;
+}
+
+
+.success-popup .my-icon {
+	font-size: 50px;
+	color : #4caf50;
+}
+
+.confirm-popup .popup-buttons {
+	background: #ffc107;
+}
+
+.confirm-popup .popup-buttons .button{
+	background: #ffc107;
+	color: white;
+}
+
+.confirm-popup .popup-body{
+	text-align: center;
+	color: #7b7b7b;
+}
+
+.confirm-popup .my-title {
+	font-size:20px;
+	color: #4d4d4d;
+}
+
+
+.confirm-popup .my-icon {
+	font-size: 50px;
+	color : #ffc107;
+}
+
+
+
+
+.custom {
+  background-color: #57595b !important; /* This sets the background color*/
+ }
+ 
+/*Set the background to transparent for ion-item*/
+.custom .item {
+  background-color: transparent;
+  border:none;   /*Removes all borders*/
+  border-top: 1px solid;   /*Top Border for each menu item*/
+  border-bottom:2px solid;   /*Bottom border for each menu item*/
+  border-color: #666;   /*Sets colors for top and bottom border*/
+  color: white;    /*Text color for each item*/
+}
+ 
+/*Changes the border for the last item*/
+.custom .item:last-child {
+  border-bottom: 1px solid #666;
+}
+ 
+.custom .item-complex .item-content, .dark .item-radio .item-content {
+  background-color: transparent;
+}
+ 
+/*Just makes the type white*/
+.custom h2,
+.custom h3,
+.custom p,
+.custom a {
+  color: white;  /*Text color for each item, overrides the color property above*/
+}

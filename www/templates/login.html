@@ -1,0 +1,36 @@
+<ion-modal-view>
+	<ion-header-bar class="bar-royal">
+		<h1 class="title">Add New Host</h1>
+		<div class="buttons">
+			<button class="button icon ion-close-round" ng-click="closeAddHost()"></button>
+		</div>
+	</ion-header-bar>
+	<ion-content class="padding">
+		<form id="connectForm" name="connectForm" ng-submit="addNewHost()">
+            <div class="list">
+				<label class="item item-input" ng-class="{ 'has-error' : connectForm.ip.$error.required && !connectForm.ip.$pristine }">
+				  <span class="input-label">Host IP</span>
+				  <input type="text" ng-model="connectData.ip" required >
+				</label>
+				<div ng-show="connectForm.ip.$error.required && !connectForm.ip.$pristine">
+					<div><i class="ion-information-circled"></i> This field is required! </div>
+				</div>
+                <label class="item item-input" ng-class="{ 'has-error' : connectForm.name.$error.required && !connectForm.name.$pristine }">
+                  <span class="input-label">Username</span>
+                  <input type="text" ng-model="connectData.name" required >
+                </label>
+				<div ng-show="connectForm.name.$error.required && !connectForm.name.$pristine">
+					<div><i class="ion-information-circled"></i> This field is required! </div>
+				</div>
+                <label class="item item-input" ng-class="{ 'has-error' : connectForm.password.$error.required && !connectForm.password.$pristine }">
+                  <span class="input-label">Password</span>
+                  <input type="password" ng-model="connectData.password" required >
+                </label>
+				<div ng-show="connectForm.password.$error.required && !connectForm.password.$pristine">
+					<div><i class="ion-information-circled"></i> This field is required! </div>
+				</div>
+                <button class="button button-block button-positive" type="submit">Add</button>
+            </div>
+        </form>
+	</ion-content>
+</ion-modal-view>

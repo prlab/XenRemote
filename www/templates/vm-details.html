@@ -1,0 +1,183 @@
+<ion-view>
+	<ion-nav-title>
+		<i class="icon ion-cloud" ng-show="'Running'===VM.data.power_state;" style="color:green"></i>
+		<i class="icon ion-cloud" ng-show="'Paused'===VM.data.power_state;" style="color:yellow"></i>
+		<i class="icon ion-cloud" ng-show="'Suspended'===VM.data.power_state;" style="color:blue"></i>
+		<i class="icon ion-cloud" ng-show="'Halted'===VM.data.power_state;" style="color:red"></i>
+		{{VM.data.name_label}}
+	</ion-nav-title>
+	<!--
+	<ion-nav-buttons side="left">
+        <img class="title-image" src="img/logo.png" />
+    </ion-nav-buttons>
+	-->
+	<ion-nav-buttons side="right">
+        <button id="refr" type="submit" class="button" ng-click="refreshVMMetrics()">
+            <i class="icon ion-loop"></i>
+        </button>
+    </ion-nav-buttons>
+
+	<div class="tabs-striped tabs-color-royal">
+		<ul class="tabs">
+			<li ng-class="{active:isSelected(1)}" class="tab-item">
+				<a ng-click="select(1)"><i class="icon ion-information-circled"></i></a></li>
+			<li ng-class="{active:isSelected(2)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(2)"><i class="icon ion-stats-bars"></i></a></li>
+			<li ng-class="{active:isSelected(3)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(3)"><i class="icon ion-flash"></i></a></li>
+			<li ng-class="{active:isSelected(4)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(4)"><i class="icon ion-camera"></i></a></li>
+		</ul>
+	</div>
+	
+	<ion-content class="padding has-tabs">
+		<div class="tab-content">
+			<div class="tab-pane" ng-show="'info'===filtText;">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<ion-list>
+							<ion-item class="item-text-wrap">
+								<p><b>Name:</b> {{VM.data.name_label}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Description:</b> {{VM.data.name_description}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Running on:</b> {{hostName}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Tags:</b> {{VM.data.tags}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Folder:</b> {{VM.data.other_config.folder}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Operating System:</b> {{}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Virtualization mode:</b> {{}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>BIOS strings copied:</b> {{}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Virtualization state:</b> {{}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>Time since startup:</b> {{}}</p>
+							</ion-item>
+							<ion-item class="item-text-wrap">
+								<p><b>UUID:</b> {{VM.data.uuid}}</p>
+							</ion-item>
+						</ion-list>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" ng-show="'stats'===filtText;">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="card">
+							<div class="item item-text-wrap">
+								<div>
+									<div class="text-center"><b>RAM</b></div>
+									<div class="myProgressBar" style="width: {{(VM.data.memory_target/VM.data.memory_dynamic_max)*100}}%;" ng-if="(VM.data.memory_target/VM.data.memory_dynamic_max)*100>20"><p class="p" style="color:#ffffff;">{{VM.data.memory_target/(1024*1024)}} MB / {{VM.data.memory_dynamic_max/(1024*1024)}} MB</p></div>
+									<div class="myProgressBar" style="width: 100%; background:white;" ng-if="(VM.data.memory_target/VM.data.memory_dynamic_max)*100==0"><p class="p" style="color:#000000;">{{VM.data.memory_target/(1024*1024)}} MB / {{VM.data.memory_dynamic_max/(1024*1024)}} MB</p></div>
+								</div>
+							</div>
+							<div class="item item-text-wrap">
+								<div class="row">
+									<div class="col-33">
+										<div>
+											<div class="text-center"><b>vCPUs</b></div>
+											<div class="text-center">{{VM.data.VCPUs_at_startup}}</div>
+										</div>
+									</div>
+									<div class="col-33">
+										<div>
+											<div class="text-center"><b>OS</b></div>
+											<div id="os" class="text-center">{{VMGuestMetrics[0].data.os_version.name}}</div>
+										</div>
+									</div>
+									<div class="col-33">
+										<div>
+											<div class="text-center"><b>Xen Tools</b></div>
+											<div id="Tools" class="text-center">{{tools}}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" ng-show="'flash'===filtText;">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="card">
+							<div class="item item-text-wrap" ng-show="'Running'===VM.data.power_state;">
+								<button type="submit" ng-click="doShutDown(VM.key)" class="button icon ion-power text-center" style="color:red"> Shut Down</button>
+								<button type="submit" ng-click="doForceShutDown(VM.key)" class="button icon ion-power" style="color:red"> Force Shut Down</button>
+								<button type="submit" ng-click="doForceReboot(VM.key)" class="button icon ion-loop" style="color:red"> Force Reboot</button>
+								<div class="row">
+									<div class="col-50">
+										<button type="submit" ng-click="doReboot(VM.key)" class="button icon ion-loop" style="color:green"> Reboot</button>
+									</div>
+									<div class="col-50">
+										<button type="submit" ng-click="doSuspend(VM.key)" class="button icon ion-pause" style="color:blue"> Suspend</button>
+									</div>
+								</div>
+							</div>
+							<div class="item item-text-wrap" ng-show="'Halted'===VM.data.power_state;">
+								<button type="submit" ng-click="doStart(VM.key)" class="button icon ion-power" style="color:green"> Start</button>
+							</div>
+							<div class="item item-text-wrap" ng-show="'Suspended'===VM.data.power_state;">
+								<button type="submit" ng-click="doResume(VM.key)" class="button icon ion-play" style="color:green"> Resume</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" ng-show="'camera'===filtText;">
+				<div class="card">
+					<div class="item item-text-wrap">
+						<div class="row item item-divider">
+							<div class="col">
+								<div>
+									<div class="text-center"><b>Name</b></div>
+								</div>
+							</div>
+							<div class="col" >
+								<div>
+									<div class="text-center"><b>Date</b></div>
+								</div>
+							</div>
+							<div class="col" >
+								<div>
+									<div class="text-center"><b>Description</b></div>
+								</div>
+							</div>
+						</div>
+						<div class="row item item-divider" style="background:white" ng-repeat="snap in snapshots">							
+							<div class="col-33">
+								<div>
+									<div class="text-center">{{snap.name}}</div>
+								</div>
+							</div>
+							<div class="col-33">
+								<div>
+									<div class="text-center">{{snap.date}} {{snap.time}}</div>
+								</div>
+							</div>
+							<div class="col-33">
+								<div>
+									<div class="text-center">{{snap.desc}}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ion-content>
+
+</ion-view>

@@ -1,0 +1,175 @@
+<ion-view>
+	<ion-nav-title>
+		<i class="icon ion-home" ng-show="false===host.state;" style="color:red"></i> 
+        <i class="icon ion-home" ng-show="true===host.state;" style="color:green"></i>
+		{{host.name}}
+	</ion-nav-title>
+	<!--
+	<ion-nav-buttons side="left">
+        <img class="title-image" src="img/logo.png" />
+    </ion-nav-buttons>
+	-->
+    <ion-nav-buttons side="right">
+        <button id="refr" type="submit" class="button" ng-click="refreshHostMetrics()">
+            <i class="icon ion-loop"></i>
+        </button>
+    </ion-nav-buttons>
+
+	<div class="tabs-striped tabs-color-royal">
+		<ul class="tabs">
+			<li ng-class="{active:isSelected(1)}" class="tab-item">
+				<a ng-click="select(1)"><i class="icon ion-information-circled"></i></a></li>
+			<li ng-class="{active:isSelected(2)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(2)"><i class="icon ion-stats-bars"></i></a></li>
+			<li ng-class="{active:isSelected(3)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(3)"><i class="icon ion-disc"></i></a></li>
+			<li ng-class="{active:isSelected(4)}" class="tab-item" data-toggle="tab">
+				<a ng-click="select(4)"><i class="icon ion-flash"></i></a></li>
+		</ul>
+	</div>
+
+  <ion-content class="padding has-tabs">
+	<div class="tab-content">
+		<div class="tab-pane" ng-show="'info'===filtText;">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<ion-list>
+						<ion-item>
+							<h2><b>GENERAL</b></h2>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Name:</b> {{host.name}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Description:</b> {{host.description}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Tags:</b> {{host.tags}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Folder:</b> {{host.folder}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Enabled:</b> {{host.enabled}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>iSCSI IQN:</b> {{host.iscsi_iqn}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Server uptime:</b> {{host.server_uptime}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Toolstack uptime:</b> {{host.toolstack_uptime}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>UUID:</b> {{host.uuid}}</p>
+						</ion-item>
+						
+						<ion-item>
+							<h2><b>MANAGEMENT INTERFACES</b></h2>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>DNS hostname:</b> {{host.hostname}}</p>
+						</ion-item>
+						<ion-item class="item-text-wrap">
+							<p><b>Management interface:</b> {{host.ip}}</p>
+						</ion-item>
+					</ion-list>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" ng-show="'stats'===filtText;">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="card">
+						<div class="item item-text-wrap">
+							<div>
+								<div class="text-center"><b>RAM</b></div>
+								<div class="myProgressBar" style="width: {{percent}}%;"><p class="p" style="color:#ffffff;">{{occupied}} MB / {{memory.total}} MB</p></div>
+							</div>
+						</div>
+						<div class="item item-text-wrap">
+							<div>
+								<div class="text-center"><b>CPU Details</b></div>
+								<br>
+							</div>
+							<div class="row">
+								<div class="col-33">
+									<div>
+										<div class="text-center"><b>Number</b></div>
+										<div class="text-center">{{host.cpus}}</div>
+									</div>
+								</div>
+								<div class="col-33">
+									<div>
+										<div class="text-center"><b>Vendor</b></div>
+										<div class="text-center">{{host.cpu_vendor}}</div>
+									</div>
+								</div>
+								<div class="col-33">
+									<div>
+										<div class="text-center"><b>Speed</b></div>
+										<div class="text-center">{{host.cpu_speed}}</div>
+									</div>
+								</div>
+							</div>
+							<br>
+							<div>
+								<div class="text-center"><b>Model</b></div>
+								<div class="text-center">{{host.cpu_model}}</div>
+							</div>
+						</div>
+						<div class="item item-text-wrap">
+							<div>
+								<div class="text-center"><b>Software Version</b></div>
+								<div class="text-center">{{host.software_version}}</div>
+							</div>
+						</div>
+						<div class="item item-text-wrap">
+							<div>
+								<div class="text-center"><b>Physical GPU</b></div>
+								<div class="text-center">{{pgpu}}</div>
+							</div>
+						</div>
+						<div class="item item-text-wrap">
+							<div>
+								<div class="text-center"><b>Virtual GPU</b></div>
+								<div class="text-center">{{vgpu}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" ng-show="'storage'===filtText;">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<ion-list>
+						<ion-item ng-repeat="SR in SRs" ng-click="viewSRDetails(host.uuid, SR.key)">
+							<div class="item-icon-right">
+								<i class="icon ion-chevron-right icon-accessory"></i>
+							</div>
+							<h2>{{SR.data.name_label}}</h2>
+						</ion-item>
+					</ion-list>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane" ng-show="'flash'===filtText;">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="card">
+						<div class="item item-text-wrap" ng-show="true===host.state;">
+							<button type="submit" ng-click="doShutDown(host.key)" class="button icon ion-power" style="color:red"> Shut Down</button>
+							<button type="submit" ng-click="doReboot(host.key)" class="button icon ion-loop" style="color:green"> Reboot</button>
+						</div>
+						<div class="item item-text-wrap" ng-show="false===host.state;">
+							<button type="submit" ng-click="doEnable(host.key)" class="button icon ion-play" style="color:green"> Enable</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+  </ion-content>
+</ion-view>

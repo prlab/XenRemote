@@ -1,0 +1,26 @@
+<ion-view view-title="XenMonitor" class="home" enable-menu-with-back-views="true">
+    <ion-nav-bar class="bar-royal">
+		<ion-nav-back-button></ion-nav-back-button>
+	</ion-nav-bar>
+	<!--
+    <ion-nav-buttons side="left">
+        <img class="title-image" src="img/logo.png" />
+    </ion-nav-buttons>
+    -->
+    <ion-content class="padding">
+		<div class="aligner">
+			<form id="signupForm" name="signupForm" class="aligner-item" ng-submit="doSignup()">
+				<div class="list">
+					<label class="item item-input">
+					  <input type="text" placeholder="PIN" ng-model="newAccountData.pin" required >
+					</label>
+					<label class="item item-input">
+					  <input type="text" placeholder="Confirm PIN" ng-model="newAccountData.confirm" required >
+					</label>
+					<button class="button button-block button-positive" type="submit">Create Account</button>
+				</div>
+			</form>
+		</div>
+    </ion-content>
+    
+</ion-view>

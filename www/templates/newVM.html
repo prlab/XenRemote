@@ -1,0 +1,25 @@
+<ion-modal-view>
+	<ion-header-bar class="bar-royal">
+		<h1 class="title">Create New VM</h1>
+		<div class="buttons">
+			<button class="button icon ion-close-round" ng-click="closeAddVM()"></button>
+		</div>
+	</ion-header-bar>
+	<ion-content class="padding">
+		<form id="addForm" name="addForm" ng-submit="createNewVM()">
+			<div class="list">
+				<label class="item item-input">
+					<div class="row">
+						<select ng-model="selectedTemplate.data" ng-options="option.data.name_label for option in myTemplates" required>
+							<option value="" disabled selected>Select a template</option>
+						</select>
+					</div>
+				</label>
+				<label class="item item-input">
+					<input ng-model="selectedTemplate.name" type="text" placeholder="Give a name to the new VM" required>
+				</label>
+				<button class="button button-block button-positive" type="submit">Create New VM</button>
+			</div>
+		</form>
+	</ion-content>
+</ion-modal-view>

@@ -1,0 +1,24 @@
+<ion-view view-title="XenMonitor" class="home" >
+    <ion-nav-bar class="bar-royal">
+		<ion-nav-back-button></ion-nav-back-button>
+	</ion-nav-bar>
+	
+    <ion-nav-buttons side="left">
+        <img class="title-image" src="img/logo.png" />
+    </ion-nav-buttons>
+    
+    <ion-content class="padding">
+		<div class="aligner">
+			<form id="loginForm" name="loginForm" class="aligner-item" ng-submit="doLogin(loginForm)" novalidate>
+				<div class="list">
+					<label class="item item-input">
+					  <input id="pin" type="text" placeholder="PIN" ng-model="loginData.pin" required >
+					</label>
+					<p style="text-align:center; color:#4d4d4d; padding-top:10px; padding-bottom: 20px;" ng-click="openSignup(loginForm)">Create new Account</p>
+					<button class="button button-block button-positive" type="submit">Login</button>
+				</div>
+			</form>
+		</div>
+    </ion-content>
+    
+</ion-view>

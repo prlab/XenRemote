@@ -1,0 +1,34 @@
+<ion-view view-title="VMs">
+	<!--
+	<ion-nav-buttons side="left">
+        <img class="title-image" src="img/logo.png" />
+    </ion-nav-buttons>
+	-->
+	<ion-nav-buttons side="right">
+		<button id="refr" type="submit" class="button" ng-click="refreshVMs()">
+            <i class="icon ion-loop"></i>
+        </button>
+		<button id="newVM" type="submit" class="button" ng-click="addVM()">
+            <i class="icon ion-plus-round"></i>
+        </button>
+	</ion-nav-buttons>
+	
+	<ion-content class="padding">
+		<ion-list>
+			<ion-item ng-click="viewVMDetails(host.uuid, VM.key)" ng-repeat="VM in hostVMs.VMs" ng-if="VM.data.is_a_snapshot==0 && VM.data.is_a_template==0 && VM.data.is_control_domain==0 && VM.data.is_snapshot_from_vmpp==0">
+				<div class="item-icon-right">
+					<i class="icon ion-chevron-right icon-accessory"></i>
+				</div>
+				<h2>
+					<i class="icon ion-cloud" ng-show="'Running'===VM.data.power_state;" style="color:green"></i>
+					<i class="icon ion-cloud" ng-show="'Paused'===VM.data.power_state;" style="color:yellow"></i>
+					<i class="icon ion-cloud" ng-show="'Suspended'===VM.data.power_state;" style="color:blue"></i>
+					<i class="icon ion-cloud" ng-show="'Halted'===VM.data.power_state;" style="color:red"></i>				   
+					{{VM.data.name_label}}
+				</h2>
+				<p>{{VM.data.name_description}}</p>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+
+</ion-view>
