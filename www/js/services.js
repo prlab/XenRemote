@@ -27,7 +27,7 @@ angular.module('xenMonitor.services', [])
 				var session = new XenAPI(name, password, ip);
 				session.init(function(err,res) {
 					if(err) {
-						$rootScope.hideLoading();
+						//$rootScope.hideLoading();
 						$rootScope.showError(err.split(':')[1] + ", Host: " + ip);
 						reject(err);
 					}else {
@@ -126,6 +126,25 @@ angular.module('xenMonitor.services', [])
 				})
 			})
 		},
+		
+		something: function(session) {
+			//$rootScope.showLoading();
+			return $q(function(resolve, reject){
+				session.VTPM.get_all_records( function(err,res){
+					//$rootScope.hideLoading();
+					if(err){
+						$rootScope.showError(err);
+						reject(err);
+					}else {
+						//$.each(res, function (key,value) {
+							resolve(JSON.stringify(res));
+						//});
+						//console.log(JSON.stringify(res));
+					}
+				})
+			})
+		},
+		
 		getPBDs: function(session) {
 			//$rootScope.showLoading();
 			return $q(function(resolve, reject){

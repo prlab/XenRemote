@@ -14,7 +14,7 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 						if (host.enabled == true) tmpenabled = 'Yes';
 						else tmpenabled = 'No';
 						
-						then1 = host.other_config.boot_time*1000;
+						var then1 = host.other_config.boot_time*1000;
 						var delta1 = Math.abs(now - then1)/1000;
 						var days1 = Math.floor(delta1 / 86400);
 						delta1 -= days1 * 86400;
@@ -23,7 +23,7 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 						var minutes1 = Math.floor(delta1 / 60) % 60;
 						delta1 -= minutes1 * 60;
 						
-						then2 = host.other_config.agent_start_time*1000;
+						var then2 = host.other_config.agent_start_time*1000;
 						var delta2 = Math.abs(now - then2)/1000;
 						var days2 = Math.floor(delta2 / 86400);
 						delta2 -= days2 * 86400;
@@ -69,7 +69,8 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 		});
 		$state.go('pin');
 	};
-	$rootScope.showError = function(err) {	
+	$rootScope.showError = function(err) {
+		$rootScope.hideLoading();
 		var alertPopup = $ionicPopup.alert({
 			title: '<i class="icon ion-alert-circled my-icon"></i>',
 			template: '<p class="my-title">Error</p>'+err,
@@ -279,7 +280,7 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.deleteHost = function(id){
-		var promise = $rootScope.showConfirm('Delete Host');
+		var promise = $rootScope.showConfirm('Remove host from the list');
 		try{
 			promise.then(function(answer){
 				if (answer == 0) return; 		
@@ -659,7 +660,7 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	function getTemplates() {
 		$scope.myTemplates = [];
 		angular.forEach($scope.hostVMs.VMs, function(item){
-			if(item.data.is_a_snapshot==0 && item.data.is_a_template==1 && item.data.is_control_domain==0 && item.data.is_snapshot_from_vmpp==0){ //&& item.data.is_default_template==0 && item.data.is_vmss_snapshot==0){
+			if(item.data.is_a_snapshot==0 && item.data.is_a_template==1 && item.data.is_control_domain==0 && item.data.is_snapshot_from_vmpp==0 && item.data.is_default_template==0 && item.data.is_vmss_snapshot==0){
 				$scope.myTemplates.push(item);
 			}
 		});
@@ -723,6 +724,13 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 		$scope.closeAddVM();
 		//doProvision(newVM);
 	}
+	
+	$scope.something = function(){
+		var promise = $xenApi.something(session.session);
+		promise.then(function(result){
+			console.log(result);
+		});
+	}
 
 	$scope.viewVMDetails = function(hostId, VMKey){
         $window.location.href = "#/app/hosts/"+hostId+"/host-vms/"+VMKey+"/vm-details";
@@ -756,7 +764,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 		}catch(err){
 			$rootScope.showError(err);
 			$rootScope.goToHosts();
-			return;
 		}
 		
 		try{
@@ -781,6 +788,8 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 				return tmp.uuid == $stateParams.hostId;
 			});
 			
+			$scope.VMMetrics = [];
+			
 			if (hostVMMetrics.length == 0){
 				getVMMetrics();
 			}
@@ -788,6 +797,9 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 				var tmpVMMetrics = hostVMMetrics[0].data.filter(function(tmp){
 					return tmp.key == $scope.VM.data.metrics;
 				});
+				if($scope.VMMetrics.length == 0) {
+					getVMMetrics();
+				}
 				$scope.VMMetrics = tmpVMMetrics[0];
 			}
 			
@@ -803,7 +815,7 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 					getVMGuestMetrics(0);
 					return;
 				}
-				//console.log($scope.VMGuestMetrics);
+				console.log($scope.VMGuestMetrics);
 				$scope.ip = $scope.VMGuestMetrics[0].data.networks[Object.keys($scope.VMGuestMetrics[0].data.networks)[0]];
 				if($scope.ip==undefined){
 					$scope.ip="";
@@ -812,6 +824,8 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 					$scope.tools = "Installed";
 				else
 					$scope.tools = "Not Installed";
+				if (!$scope.VMGuestMetrics[0].data.os_version.name) $scope.os = "Unknown";
+				else $scope.os = $scope.VMGuestMetrics[0].data.os_version.name;
 			}
 		}catch(err){
 			$rootScope.showError(err);
@@ -819,23 +833,21 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 		}	
 	});
 	
-	
 	function getVMMetrics() {
+		var now = (new Date).getTime();
 		try{
 			var promise = $xenApi.getVMMetrics(session.session);
 			promise.then(function(VM_metrics){
 				$scope.VMMetrics = VM_metrics.filter(function(tmp){
 					return tmp.key == $scope.VM.data.metrics;
 				});
-				//console.log($scope.VMMetrics);
-
+				//console.log("VMMetrics");
+				//console.log(JSON.stringify($scope.VMMetrics));				
 				var tmp = {
 					uuid: $stateParams.hostId,
 					data: VM_metrics
 				};
 				angular.forEach(hostVMMetrics, function(item){
-					//console.log($stateParams.hostId);
-					//console.log(item.uuid);
 					if($stateParams.hostId==item.uuid) {
 						var index = hostVMMetrics.indexOf(item);
 						hostVMMetrics.splice(index,1);
@@ -843,6 +855,25 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 				});
 				hostVMMetrics.push(tmp);
 				$localStorage.storeObject($rootScope.user.pin+'VMMetrics',hostVMMetrics);
+				
+				if ('Running' != $scope.VM.data.power_state) {
+					$scope.time_since_startup = "-";
+					return;
+				}
+				var arr = $scope.VMMetrics[0].data.start_time.split(/[T : Z]/);
+				
+				var then = Date.UTC(arr[0].slice(0,4), arr[0].slice(4,6)-1, arr[0].slice(6,8), arr[1], arr[2], arr[3]);
+				
+				var delta = Math.abs(now - then)/1000;
+				var days = Math.floor(delta / 86400);
+				delta -= days * 86400;
+				var hours = Math.floor(delta / 3600) % 24;
+				delta -= hours * 3600;
+				var minutes = Math.floor(delta / 60) % 60;
+				delta -= minutes * 60;
+				
+				$scope.time_since_startup = days + " days " + hours + " hours " + minutes + " minutes ";
+			
 			});
 		}catch(err){
 			$rootScope.showError('Something went wrong!');
@@ -859,13 +890,14 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 				$scope.VMGuestMetrics = VMGuest_metrics.filter(function(tmp){
 					return tmp.key == $scope.VM.data.guest_metrics;
 				});
+				//console.log("VMGuestMetrics");
+				//console.log(JSON.stringify($scope.VMGuestMetrics));
+				
 				var tmp = {
 					uuid: $stateParams.hostId,
 					data: VMGuest_metrics
 				};
 				angular.forEach(hostVMGuestMetrics, function(item){
-					//console.log($stateParams.hostId);
-					//console.log(item.uuid);
 					if($stateParams.hostId==item.uuid) {
 						var index = hostVMGuestMetrics.indexOf(item);
 						hostVMGuestMetrics.splice(index,1);
@@ -882,6 +914,8 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 					$scope.tools = "Installed";
 				else
 					$scope.tools = "Not Installed";
+				if (!$scope.VMGuestMetrics[0].data.os_version.name) $scope.os = "Unknown";
+				else $scope.os = $scope.VMGuestMetrics[0].data.os_version.name;
 				if(showSuccess) $rootScope.showSuccess('Refresh successfully completed.');
 			});
 		}catch(err){
@@ -916,7 +950,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doShutDown = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.shutDown(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -925,7 +958,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doReboot = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.reboot(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -934,7 +966,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doSuspend = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.suspend(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -943,7 +974,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doForceShutDown = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.forceShutDown(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -952,7 +982,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doForceReboot = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.forceReboot(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -961,7 +990,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doStart = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.start(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
@@ -970,7 +998,6 @@ angular.module('xenMonitor.controllers', []).run(['$rootScope', '$q', '$xenApi',
 	}
 	
 	$scope.doResume = function(id){
-		//$rootScope.showSuccess(id);
 		var promise = $xenApi.resume(session.session, id);
 		//$scope.refreshVMMetrics();
 		promise.then(function(result){
